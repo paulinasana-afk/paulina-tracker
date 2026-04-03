@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Paulina 2.0 — Daily Self-Improvement</title>
+<meta name="description" content="Personal self-improvement tracker for daily habits, monthly and quarterly goals.">
+<link href="https://api.fontshare.com/v2/css?f[]=general-sans@300,400,500,600,700&display=swap" rel="stylesheet">
+<style>
+/* ===== RESET & BASE ===== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;scroll-behavior:smooth}
+body{min-height:100dvh;line-height:1.6;font-family:'General Sans','Helvetica Neue',sans-serif;font-size:15px}
+img,svg{display:block;max-width:100%}
+input,button,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:none}
+h1,h2,h3,h4{line-height:1.2}
+p{max-width:72ch}
+
+/* ===== COLOR TOKENS ===== */
+:root{
+  --bg:#f8f6f2;--surface:#fff;--surface-2:#f3f0ec;--border:#e5e2dc;
+  --text:#1f1d18;--text-muted:#7a7974;--text-faint:#bab9b4;
+  --primary:#c06a2b;--primary-light:#fdf3eb;--primary-hover:#a85a22;
+  --success:#3d8b2c;--success-light:#edf7ea;
+  --danger:#c0392b;
+  --chart-1:#c06a2b;--chart-2:#2d8f6f;--chart-3:#d4a520;--chart-4:#4a7fb5;
+  --radius:0.5rem;--shadow:0 1px 3px rgba(0,0,0,0.06);
+}
+.dark{
+  --bg:#141210;--surface:#1c1a17;--surface-2:#242220;--border:#333130;
+  --text:#d4d2ce;--text-muted:#807e7a;--text-faint:#555350;
+  --primary:#d48a4e;--primary-light:#2a2018;--primary-hover:#e0a06a;
+  --success:#5daa48;--success-light:#1a2a14;
+  --danger:#e05a4e;
+  --chart-1:#d48a4e;--chart-2:#4db88a;--chart-3:#e8c040;--chart-4:#6a9fd0;
+  --shadow:0 1px 3px rgba(0,0,0,0.3);
+}
+body{background:var(--bg);color:var(--text)}
+
+/* ===== LAYOUT ===== */
+.container{max-width:960px;margin:0 auto;padding:1.25rem 1rem 3rem}
+.grid{display:grid;grid-template-columns:1fr;gap:1.25rem}
+@media(min-width:768px){.grid{grid-template-columns:1fr 1fr}}
+.space-y>*+*{margin-top:1.25rem}
+
+/* ===== CARD ===== */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.card-header{padding:1rem 1.25rem 0.5rem;display:flex;align-items:center;justify-content:space-between;gap:0.5rem}
+.card-body{padding:0.5rem 1.25rem 1.25rem}
+
+/* ===== VISION CARD ===== */
+.vision-card{background:linear-gradient(135deg,var(--primary-light),var(--surface));border:1px solid var(--border)}
+.vision-card .label{font-size:0.65rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:0.15rem}
+.vision-card p{font-size:0.875rem;line-height:1.6}
+
+/* ===== TYPOGRAPHY ===== */
+.text-xs{font-size:0.75rem}.text-sm{font-size:0.8125rem}.text-base{font-size:0.9375rem}
+.text-lg{font-size:1.125rem}.text-xl{font-size:1.375rem}
+.font-bold{font-weight:700}.font-semibold{font-weight:600}.font-medium{font-weight:500}
+.text-muted{color:var(--text-muted)}.text-faint{color:var(--text-faint)}
+.text-primary{color:var(--primary)}
+.line-through{text-decoration:line-through}
+.uppercase{text-transform:uppercase}.tracking-wide{letter-spacing:0.06em}
+
+/* ===== BADGE ===== */
+.badge{display:inline-flex;align-items:center;font-size:0.7rem;font-weight:600;padding:0.2rem 0.55rem;border-radius:999px;white-space:nowrap}
+.badge-default{background:var(--primary);color:#fff}
+.badge-muted{background:var(--surface-2);color:var(--text-muted)}
+.badge-success{background:var(--success-light);color:var(--success)}
+
+/* ===== BUTTON ===== */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:0.35rem;font-size:0.8125rem;font-weight:500;padding:0.45rem 0.85rem;border-radius:var(--radius);transition:all 0.15s ease;border:1px solid transparent}
+.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-hover)}
+.btn-secondary{background:var(--surface-2);color:var(--text)}.btn-secondary:hover{background:var(--border)}
+.btn-ghost{background:transparent;color:var(--text-muted)}.btn-ghost:hover{background:var(--surface-2)}
+.btn-sm{font-size:0.75rem;padding:0.3rem 0.65rem}
+.btn-icon{width:2rem;height:2rem;padding:0;border-radius:var(--radius)}
+.btn-block{width:100%}
+
+/* ===== CHECKBOX ===== */
+.checkbox-wrap{display:flex;align-items:flex-start;gap:0.65rem;padding:0.7rem;border-radius:var(--radius);transition:background 0.15s}
+.checkbox-wrap.checked{background:var(--primary-light)}
+.checkbox-wrap:not(.checked){background:var(--surface-2)}
+.cbox{width:18px;height:18px;border-radius:4px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;margin-top:1px;transition:all 0.15s}
+.cbox.checked{background:var(--primary);border-color:var(--primary)}
+.cbox.checked svg{display:block}.cbox svg{display:none}
+.cbox-sm{width:16px;height:16px;border-radius:3px}
+
+/* ===== INPUT / TEXTAREA ===== */
+.input,.textarea{width:100%;padding:0.5rem 0.75rem;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);font-size:0.8125rem;outline:none;transition:border-color 0.15s}
+.input:focus,.textarea:focus{border-color:var(--primary)}
+.textarea{resize:vertical;min-height:60px}
+
+/* ===== TABS ===== */
+.tabs{display:flex;gap:0.25rem;background:var(--surface-2);padding:0.2rem;border-radius:var(--radius);width:fit-content}
+.tab{font-size:0.8125rem;font-weight:500;padding:0.35rem 0.85rem;border-radius:calc(var(--radius) - 2px);cursor:pointer;transition:all 0.15s;color:var(--text-muted)}
+.tab.active{background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
+
+/* ===== PROGRESS BAR ===== */
+.progress-track{height:6px;background:var(--surface-2);border-radius:999px;overflow:hidden}
+.progress-fill{height:100%;border-radius:999px;transition:width 0.4s ease}
+
+/* ===== STAT CARD ===== */
+.stat{display:flex;align-items:center;gap:0.65rem;padding:0.65rem;background:var(--surface-2);border-radius:var(--radius)}
+.stat-icon{width:2.25rem;height:2.25rem;border-radius:var(--radius);background:var(--primary-light);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* ===== CHART ===== */
+.chart-container{width:100%;overflow-x:auto}
+.chart-bars{display:flex;align-items:flex-end;gap:2px;height:160px;padding-top:0.5rem}
+.chart-bar{flex:1;min-width:6px;border-radius:2px 2px 0 0;transition:height 0.3s ease;cursor:pointer;position:relative}
+.chart-bar:hover::after{content:attr(data-tooltip);position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);font-size:0.65rem;padding:0.15rem 0.4rem;border-radius:3px;white-space:nowrap;z-index:10}
+.chart-labels{display:flex;gap:2px;margin-top:0.25rem}
+.chart-labels span{flex:1;text-align:center;font-size:0.6rem;color:var(--text-faint)}
+.quarter-bars{display:flex;align-items:flex-end;gap:4px;justify-content:center}
+.quarter-group{display:flex;flex-direction:column;align-items:center;gap:0.25rem}
+.quarter-group-bars{display:flex;align-items:flex-end;gap:3px;height:180px}
+.q-bar{width:20px;border-radius:2px 2px 0 0;transition:height 0.3s ease}
+
+/* ===== ICON ===== */
+.icon{width:1rem;height:1rem;display:inline-block;vertical-align:middle;flex-shrink:0}
+.icon-sm{width:0.85rem;height:0.85rem}
+.icon-lg{width:1.25rem;height:1.25rem}
+
+/* ===== UTILITIES ===== */
+.flex{display:flex}.items-center{align-items:center}.justify-between{justify-content:space-between}
+.gap-1{gap:0.25rem}.gap-2{gap:0.5rem}.gap-3{gap:0.75rem}.gap-4{gap:1rem}
+.flex-1{flex:1}.flex-wrap{flex-wrap:wrap}.flex-col{flex-direction:column}
+.shrink-0{flex-shrink:0}.min-w-0{min-width:0}
+.mt-1{margin-top:0.25rem}.mt-2{margin-top:0.5rem}.mt-3{margin-top:0.75rem}.mt-4{margin-top:1rem}
+.mb-1{margin-bottom:0.25rem}.mb-2{margin-bottom:0.5rem}.mb-3{margin-bottom:0.75rem}
+.p-3{padding:0.75rem}.p-4{padding:1rem}
+.hidden{display:none}
+.border-t{border-top:1px solid var(--border)}
+.w-full{width:100%}
+.tabular-nums{font-variant-numeric:tabular-nums}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem}
+.grid-4{display:grid;grid-template-columns:repeat(2,1fr);gap:0.75rem}
+@media(min-width:768px){.grid-4{grid-template-columns:repeat(4,1fr)}}
+.text-center{text-align:center}
+.cursor-pointer{cursor:pointer}
+
+/* ===== PAGE TRANSITIONS ===== */
+.page{animation:fadeIn 0.2s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+/* ===== CATEGORY COLORS ===== */
+.cat-business{color:var(--primary)}
+.cat-health{color:var(--chart-2)}
+.cat-family{color:var(--chart-4)}
+
+/* ===== LEGEND ===== */
+.legend{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;font-size:0.7rem;color:var(--text-muted)}
+.legend-dot{width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:0.25rem}
+
+/* ===== FOOTER ===== */
+footer{text-align:center;padding:1.5rem 1rem;font-size:0.7rem;color:var(--text-faint)}
+footer a{color:inherit;text-decoration:none}
+footer a:hover{color:var(--text-muted)}
+
+/* ===== HABIT INPUT ===== */
+.habit-item{margin-bottom:0.35rem}
+.habit-input-row{display:flex;gap:0.5rem;padding:0.25rem 0.7rem 0.5rem 2.75rem}
+.habit-input-row .input{flex:1;font-size:0.8125rem;padding:0.4rem 0.65rem}
+.habit-answer{padding:0.25rem 0.7rem 0.5rem 2.75rem}
+
+/* ===== DIALOG ===== */
+.dialog-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:100;display:flex;align-items:center;justify-content:center;padding:1rem;animation:fadeIn 0.15s ease}
+.dialog{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);max-width:480px;width:100%;padding:1.5rem;box-shadow:0 8px 32px rgba(0,0,0,0.12)}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+// ===== DATA LAYER (IndexedDB with fallback) =====
+const DB_NAME='elevate_db';const DB_VERSION=1;
+let db=null;
+
+function openDB(){
+  return new Promise((resolve,reject)=>{
+    const req=indexedDB.open(DB_NAME,DB_VERSION);
+    req.onupgradeneeded=(e)=>{
+      const d=e.target.result;
+      if(!d.objectStoreNames.contains('dailyLogs'))d.createObjectStore('dailyLogs',{keyPath:'date'});
+      if(!d.objectStoreNames.contains('goals'))d.createObjectStore('goals',{keyPath:'id'});
+      if(!d.objectStoreNames.contains('settings'))d.createObjectStore('settings',{keyPath:'key'});
+    };
+    req.onsuccess=(e)=>{db=e.target.result;resolve(db)};
+    req.onerror=()=>reject(req.error);
+  });
+}
+
+function dbGet(store,key){
+  return new Promise((res,rej)=>{
+    const tx=db.transaction(store,'readonly');
+    const s=tx.objectStore(store);
+    const r=s.get(key);
+    r.onsuccess=()=>res(r.result||null);
+    r.onerror=()=>rej(r.error);
+  });
+}
+
+function dbPut(store,val){
+  return new Promise((res,rej)=>{
+    const tx=db.transaction(store,'readwrite');
+    const s=tx.objectStore(store);
+    const r=s.put(val);
+    r.onsuccess=()=>res(val);
+    r.onerror=()=>rej(r.error);
+  });
+}
+
+function dbGetAll(store){
+  return new Promise((res,rej)=>{
+    const tx=db.transaction(store,'readonly');
+    const s=tx.objectStore(store);
+    const r=s.getAll();
+    r.onsuccess=()=>res(r.result||[]);
+    r.onerror=()=>rej(r.error);
+  });
+}
+
+function dbDelete(store,key){
+  return new Promise((res,rej)=>{
+    const tx=db.transaction(store,'readwrite');
+    const s=tx.objectStore(store);
+    const r=s.delete(key);
+    r.onsuccess=()=>res(true);
+    r.onerror=()=>rej(r.error);
+  });
+}
+
+function uuid(){return crypto.randomUUID?crypto.randomUUID():'g-'+Date.now()+'-'+Math.random().toString(36).slice(2,9)}
+
+// ===== DATE HELPERS =====
+function todayStr(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+function currentMonth(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`}
+function currentQuarter(){const d=new Date();return `${d.getFullYear()}-Q${Math.ceil((d.getMonth()+1)/3)}`}
+function monthName(ym){const[y,m]=ym.split('-');return new Date(+y,+m-1).toLocaleDateString('en-US',{month:'long',year:'numeric'})}
+function monthShort(ym){const[y,m]=ym.split('-');return new Date(+y,+m-1).toLocaleDateString('en-US',{month:'short'})}
+function daysInMonth(ym){const[y,m]=ym.split('-');return new Date(+y,+m,0).getDate()}
+function quarterLabel(q){return q.replace('-',' ')}
+function quarterMonths(q){
+  const[y,qp]=q.split('-Q');const s=(+qp-1)*3+1;
+  return[`${y}-${String(s).padStart(2,'0')}`,`${y}-${String(s+1).padStart(2,'0')}`,`${y}-${String(s+2).padStart(2,'0')}`];
+}
+function formatDate(ds){return new Date(ds+'T00:00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'})}
+function getWorkingDaysLeft(){
+  const now=new Date();const y=now.getFullYear();const m=now.getMonth();
+  const lastDay=new Date(y,m+1,0).getDate();let count=0;
+  for(let d=now.getDate()+1;d<=lastDay;d++){
+    const dow=new Date(y,m,d).getDay();
+    if(dow!==0&&dow!==6)count++;
+  }
+  return count;
+}
+
+// ===== SVG ICONS =====
+const icons={
+  sun:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>`,
+  moon:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`,
+  check:`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>`,
+  checkPrimary:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="text-primary"><polyline points="20 6 9 17 4 12"/></svg>`,
+  eye:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`,
+  pencil:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>`,
+  target:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>`,
+  plus:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
+  trash:`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>`,
+  back:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>`,
+  chart:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>`,
+  right:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>`,
+  sunHabit:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>`,
+  book:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`,
+  exercise:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M18 6L6 18"/><path d="M8 6H6v2"/><path d="M18 16v2h-2"/><path d="M6 18l4-4"/><path d="M14 6l4 4"/><circle cx="12" cy="12" r="2"/></svg>`,
+  briefcase:`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>`,
+  heart:`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`,
+  users:`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+  calendar:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
+  checkCircle:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
+};
+
+// ===== STATE =====
+let state={
+  page:'dashboard',
+  dark:window.matchMedia('(prefers-color-scheme:dark)').matches,
+  vm:null,
+  editingVM:false,
+  todayLog:null,
+  monthlyGoals:[],
+  quarterlyGoals:[],
+  allLogs:[],
+  allGoals:[],
+  addingGoal:null, // {type,category}
+  newGoalText:'',
+  selectedMonth:currentMonth(),
+  progressTab:'monthly',
+  summaryMonthOffset:0, // 0=current month, -1=last month, etc.
+};
+
+// ===== RENDER ENGINE =====
+const app=document.getElementById('app');
+
+async function init(){
+  await openDB();
+  // Load vision/mission
+  state.vm=await dbGet('settings','visionMission');
+  if(!state.vm){
+    state.vm={key:'visionMission',vision:'Build generational wealth through smart investing while raising a thriving family and living with purpose.',mission:'Every day, I grow my mind, strengthen my body, deepen my relationships, and make disciplined decisions that compound over time.'};
+    await dbPut('settings',state.vm);
+  }
+  // Load today's log
+  state.todayLog=await dbGet('dailyLogs',todayStr());
+  if(!state.todayLog)state.todayLog={date:todayStr(),gratitude:false,reading:false,exercise:false,gratitudeText:'',readingText:'',exerciseText:''};
+  // Migrate old deadBugs key to exercise
+  if('deadBugs' in state.todayLog && !('exercise' in state.todayLog)){
+    state.todayLog.exercise=state.todayLog.deadBugs;
+    state.todayLog.exerciseText=state.todayLog.deadBugsText||'';
+    delete state.todayLog.deadBugs;
+    delete state.todayLog.deadBugsText;
+    await dbPut('dailyLogs',state.todayLog);
+  }
+  // Ensure text fields exist
+  if(!state.todayLog.gratitudeText)state.todayLog.gratitudeText='';
+  if(!state.todayLog.readingText)state.todayLog.readingText='';
+  if(!state.todayLog.exerciseText)state.todayLog.exerciseText='';
+  // Load goals
+  const allGoals=await dbGetAll('goals');
+  state.allGoals=allGoals;
+  state.monthlyGoals=allGoals.filter(g=>g.type==='monthly'&&g.period===currentMonth());
+  state.quarterlyGoals=allGoals.filter(g=>g.type==='quarterly'&&g.period===currentQuarter());
+  // Load all logs
+  state.allLogs=await dbGetAll('dailyLogs');
+  // Seed sample data ONLY on very first visit (never again)
+  const seeded=await dbGet('settings','hasSeeded');
+  if(!seeded)await seedData();
+  if(state.dark)document.documentElement.classList.add('dark');
+  render();
+}
+
+async function seedData(){
+  const qGoals=[
+    {id:uuid(),type:'quarterly',category:'business',period:currentQuarter(),text:'Grow portfolio by 8% through strategic rebalancing',completed:false},
+    {id:uuid(),type:'quarterly',category:'business',period:currentQuarter(),text:'Research and invest in 2 new AI/quantum positions',completed:false},
+    {id:uuid(),type:'quarterly',category:'health',period:currentQuarter(),text:'Exercise 3x per week consistently',completed:false},
+    {id:uuid(),type:'quarterly',category:'health',period:currentQuarter(),text:'Lower LDL cholesterol by 10% through diet changes',completed:false},
+    {id:uuid(),type:'quarterly',category:'family',period:currentQuarter(),text:'Plan one family trip abroad',completed:true},
+    {id:uuid(),type:'quarterly',category:'family',period:currentQuarter(),text:'Establish weekly date night routine',completed:false},
+  ];
+  const mGoals=[
+    {id:uuid(),type:'monthly',category:'business',period:currentMonth(),text:'Review and rebalance bond allocation',completed:false},
+    {id:uuid(),type:'monthly',category:'business',period:currentMonth(),text:'Complete deep-dive on quantum computing ETFs',completed:false},
+    {id:uuid(),type:'monthly',category:'health',period:currentMonth(),text:'Exercise 5x/week for core strength',completed:false},
+    {id:uuid(),type:'monthly',category:'health',period:currentMonth(),text:'Walk 8,000 steps daily average',completed:false},
+    {id:uuid(),type:'monthly',category:'family',period:currentMonth(),text:'Take kids to Ocean Park on weekend',completed:true},
+    {id:uuid(),type:'monthly',category:'family',period:currentMonth(),text:'Call parents twice this month',completed:false},
+  ];
+  // Previous month goals (for summary history)
+  const prevD=new Date();prevD.setDate(1);prevD.setMonth(prevD.getMonth()-1);
+  const prevMonth=`${prevD.getFullYear()}-${String(prevD.getMonth()+1).padStart(2,'0')}`;
+  const prevMGoals=[
+    {id:uuid(),type:'monthly',category:'business',period:prevMonth,text:'Finalize Q1 investment thesis',completed:true},
+    {id:uuid(),type:'monthly',category:'business',period:prevMonth,text:'Set up automated portfolio alerts',completed:true},
+    {id:uuid(),type:'monthly',category:'health',period:prevMonth,text:'Complete 20 exercise sessions',completed:false},
+    {id:uuid(),type:'monthly',category:'health',period:prevMonth,text:'Meditate 15 minutes daily',completed:true},
+    {id:uuid(),type:'monthly',category:'family',period:prevMonth,text:'Plan weekend outing with kids',completed:true},
+    {id:uuid(),type:'monthly',category:'family',period:prevMonth,text:'Write letter to parents',completed:false},
+  ];
+  for(const g of[...qGoals,...mGoals,...prevMGoals])await dbPut('goals',g);
+  // Seed some daily logs for past days this month
+  const today=new Date();
+  for(let d=1;d<today.getDate();d++){
+    const ds=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    await dbPut('dailyLogs',{date:ds,gratitude:Math.random()>0.3,reading:Math.random()>0.35,exercise:Math.random()>0.4,gratitudeText:'',readingText:'',exerciseText:''});
+  }
+  // Seed daily logs for previous month
+  const prevDim=new Date(prevD.getFullYear(),prevD.getMonth()+1,0).getDate();
+  for(let d=1;d<=prevDim;d++){
+    const ds=`${prevD.getFullYear()}-${String(prevD.getMonth()+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    await dbPut('dailyLogs',{date:ds,gratitude:Math.random()>0.25,reading:Math.random()>0.4,exercise:Math.random()>0.45,gratitudeText:'',readingText:'',exerciseText:''});
+  }
+  // Mark as seeded so this never runs again
+  await dbPut('settings',{key:'hasSeeded',value:true});
+  // Reload
+  const allGoals=await dbGetAll('goals');
+  state.allGoals=allGoals;
+  state.monthlyGoals=allGoals.filter(g=>g.type==='monthly'&&g.period===currentMonth());
+  state.quarterlyGoals=allGoals.filter(g=>g.type==='quarterly'&&g.period===currentQuarter());
+  state.allLogs=await dbGetAll('dailyLogs');
+}
+
+function render(){
+  if(state.page==='dashboard')renderDashboard();
+  else if(state.page==='progress')renderProgress();
+  else if(state.page==='summary')renderSummary();
+}
+
+// ===== DASHBOARD =====
+function renderDashboard(){
+  const log=state.todayLog;
+  const completed=[log.gratitude,log.reading,log.exercise].filter(Boolean).length;
+  const habits=[
+    {key:'gratitude',label:'Gratitude',desc:'Write down what you\'re grateful for',icon:icons.sunHabit,textKey:'gratitudeText',placeholder:'What are you grateful for today?'},
+    {key:'reading',label:'Reading & Reflection',desc:'Read and reflect on insights',icon:icons.book,textKey:'readingText',placeholder:'What did you read or reflect on?'},
+    {key:'exercise',label:'Exercise',desc:'Physical activity for the day',icon:icons.exercise,textKey:'exerciseText',placeholder:'What exercise did you do?'},
+  ];
+  const cats=[
+    {key:'business',label:'Business',icon:icons.briefcase,cls:'cat-business'},
+    {key:'health',label:'Health / Personal',icon:icons.heart,cls:'cat-health'},
+    {key:'family',label:'Family / Relationships',icon:icons.users,cls:'cat-family'},
+  ];
+
+  app.innerHTML=`<div class="page"><div class="container space-y">
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+      <div><h1 class="text-xl font-bold">Paulina 2.0</h1><p class="text-sm text-muted">${formatDate(todayStr())} · ${getWorkingDaysLeft()} working days left this month</p></div>
+      <button class="btn-icon btn-ghost" onclick="toggleTheme()">${state.dark?icons.sun:icons.moon}</button>
+    </div>
+
+    <!-- Vision & Mission -->
+    ${state.editingVM?renderVMEdit():renderVM()}
+
+    <!-- Grid -->
+    <div class="grid">
+      <div class="space-y">
+        <!-- Habits -->
+        <div class="card">
+          <div class="card-header">
+            <div><h2 class="text-base font-semibold">Morning Habits</h2><p class="text-xs text-muted">${formatDate(todayStr())}</p></div>
+            <span class="badge ${completed===3?'badge-default':'badge-muted'}">${completed}/3</span>
+          </div>
+          <div class="card-body space-y" style="--gap:0.5rem">
+            ${habits.map(h=>{
+              const ck=log[h.key];
+              const txt=log[h.textKey]||'';
+              return `<div class="habit-item">
+                <div class="checkbox-wrap ${ck?'checked':''}">
+                  <div class="cbox ${ck?'checked':''}" onclick="toggleHabit('${h.key}')">${icons.check}</div>
+                  <span class="shrink-0">${h.icon}</span>
+                  <div class="min-w-0 flex-1">
+                    <p class="text-sm font-medium ${ck?'line-through text-muted':''}">${h.label}</p>
+                    <p class="text-xs text-muted">${h.desc}</p>
+                  </div>
+                  ${ck?`<span class="text-primary" style="margin-left:auto">${icons.checkPrimary}</span>`:''}
+                </div>
+                ${ck&&txt?`<div class="habit-answer"><p class="text-xs text-muted" style="margin-bottom:0.15rem">Your answer:</p><p class="text-sm">${esc(txt)}</p></div>`:
+                !ck?`<div class="habit-input-row">
+                  <input class="input" id="habit-input-${h.key}" placeholder="${h.placeholder}" value="${esc(txt)}" onkeydown="if(event.key==='Enter')submitHabit('${h.key}','${h.textKey}')">
+                  <button class="btn btn-primary btn-sm" onclick="submitHabit('${h.key}','${h.textKey}')">Enter</button>
+                </div>`:''}
+              </div>`;
+            }).join('')}
+          </div>
+        </div>
+
+        <!-- Monthly Goals -->
+        ${renderGoals('monthly',currentMonth(),state.monthlyGoals,cats)}
+      </div>
+
+      <div class="space-y">
+        <!-- Quarterly Goals -->
+        ${renderGoals('quarterly',currentQuarter(),state.quarterlyGoals,cats)}
+
+        <!-- Summary Link -->
+        <div class="card cursor-pointer" onclick="goSummary()">
+          <div class="card-body flex items-center justify-between p-4">
+            <div class="flex items-center gap-2"><span class="text-primary">${icons.checkCircle}</span><div><p class="text-base font-semibold">Summary</p><p class="text-xs text-muted">Habit stats &amp; past goals history</p></div></div>
+            ${icons.right}
+          </div>
+        </div>
+
+        <!-- Progress Link -->
+        <div class="card cursor-pointer" onclick="goProgress()">
+          <div class="card-body flex items-center justify-between p-4">
+            <div class="flex items-center gap-2"><span class="text-primary">${icons.chart}</span><div><p class="text-base font-semibold">Progress & Insights</p><p class="text-xs text-muted">Monthly and quarterly completion charts</p></div></div>
+            ${icons.right}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer><a href="https://www.perplexity.ai/computer" target="_blank" rel="noopener noreferrer">Created with Perplexity Computer</a></footer>
+  </div>`;
+}
+
+function renderVM(){
+  const vm=state.vm;
+  return `<div class="card vision-card">
+    <div class="card-header"><h2 class="text-base font-semibold flex items-center gap-2"><span class="text-primary">${icons.eye}</span> Vision & Mission</h2>
+    <button class="btn-icon btn-ghost" onclick="startEditVM()">${icons.pencil}</button></div>
+    <div class="card-body">
+      <p class="label">Vision</p><p class="text-sm mb-3">${esc(vm.vision)}</p>
+      <p class="label">Mission</p><p class="text-sm">${esc(vm.mission)}</p>
+    </div></div>`;
+}
+
+function renderVMEdit(){
+  return `<div class="card vision-card">
+    <div class="card-header"><h2 class="text-base font-semibold flex items-center gap-2"><span class="text-primary">${icons.eye}</span> Vision & Mission</h2></div>
+    <div class="card-body space-y">
+      <div><label class="text-xs font-medium text-muted mb-1" style="display:block">Vision</label>
+      <textarea class="textarea" id="vm-vision" rows="2">${esc(state.vm.vision)}</textarea></div>
+      <div><label class="text-xs font-medium text-muted mb-1" style="display:block">Mission</label>
+      <textarea class="textarea" id="vm-mission" rows="2">${esc(state.vm.mission)}</textarea></div>
+      <div class="flex gap-2"><button class="btn btn-primary btn-sm" onclick="saveVM()">Save</button><button class="btn btn-secondary btn-sm" onclick="cancelEditVM()">Cancel</button></div>
+    </div></div>`;
+}
+
+function renderGoals(type,period,goals,cats){
+  const title=type==='monthly'?'Monthly':'Quarterly';
+  const periodLabel=type==='monthly'?monthName(period):quarterLabel(period);
+  return `<div class="card">
+    <div class="card-header">
+      <span class="flex items-center gap-2"><span class="text-primary">${icons.target}</span><h2 class="text-base font-semibold">${title} Goals</h2></span>
+      <span class="badge badge-muted">${periodLabel}</span>
+    </div>
+    <div class="card-body space-y">
+      ${cats.map(cat=>{
+        const cg=goals.filter(g=>g.category===cat.key);
+        if(cg.length===0&&!(state.addingGoal&&state.addingGoal.type===type))return'';
+        return `<div>
+          <div class="flex items-center gap-2 mb-2"><span class="${cat.cls}">${cat.icon}</span>
+          <p class="text-xs font-medium uppercase tracking-wide text-muted">${cat.label}</p></div>
+          ${cg.map(g=>`<div class="flex items-center gap-2 mb-1" style="padding:0.15rem 0">
+            <div class="cbox cbox-sm ${g.completed?'checked':''}" onclick="toggleGoal('${g.id}','${type}')">${icons.check}</div>
+            <span class="text-sm flex-1 ${g.completed?'line-through text-muted':''}">${esc(g.text)}</span>
+            <button class="btn-icon btn-ghost" style="opacity:0.3;width:1.5rem;height:1.5rem" onclick="deleteGoal('${g.id}','${type}')">${icons.trash}</button>
+          </div>`).join('')}
+        </div>`;
+      }).join('')}
+      ${state.addingGoal&&state.addingGoal.type===type?renderAddGoal(type,period,cats):`
+      <button class="btn btn-ghost btn-block text-muted" onclick="startAddGoal('${type}')">
+        ${icons.plus} Add Goal
+      </button>`}
+    </div></div>`;
+}
+
+function renderAddGoal(type,period,cats){
+  return `<div class="border-t" style="padding-top:0.75rem;margin-top:0.25rem">
+    <div class="flex gap-2 mb-2 flex-wrap">${cats.map(c=>`<button class="btn btn-sm ${state.addingGoal.category===c.key?'btn-primary':'btn-secondary'}" onclick="setGoalCat('${c.key}')">${c.icon} ${c.label.split(' /')[0]}</button>`).join('')}</div>
+    <input class="input mb-2" id="new-goal-input" placeholder="What do you want to achieve?" value="${esc(state.newGoalText)}" onkeydown="if(event.key==='Enter')saveGoal('${type}','${period}')" oninput="state.newGoalText=this.value">
+    <div class="flex gap-2"><button class="btn btn-primary btn-sm" onclick="saveGoal('${type}','${period}')">Add Goal</button><button class="btn btn-secondary btn-sm" onclick="cancelAddGoal()">Cancel</button></div>
+  </div>`;
+}
+
+// ===== PROGRESS PAGE =====
+function renderProgress(){
+  const qMonths=quarterMonths(currentQuarter());
+  const selMonth=state.selectedMonth;
+  const allLogs=state.allLogs;
+
+  function monthStats(ym){
+    const ml=allLogs.filter(l=>l.date.startsWith(ym));
+    const td=daysInMonth(ym);
+    const gr=ml.filter(l=>l.gratitude).length;
+    const rd=ml.filter(l=>l.reading).length;
+    const ex=ml.filter(l=>l.exercise||l.deadBugs).length;
+    const all=ml.filter(l=>l.gratitude&&l.reading&&(l.exercise||l.deadBugs)).length;
+    return{month:monthShort(ym),monthFull:monthName(ym),totalDays:td,gratitude:gr,reading:rd,exercise:ex,allThree:all,
+      gratitudeRate:td?Math.round(gr/td*100):0,readingRate:td?Math.round(rd/td*100):0,exerciseRate:td?Math.round(ex/td*100):0,allThreeRate:td?Math.round(all/td*100):0};
+  }
+
+  const ms=monthStats(selMonth);
+  const qStats=qMonths.map(m=>monthStats(m));
+  const qTotG=qStats.reduce((s,m)=>s+m.gratitude,0);
+  const qTotR=qStats.reduce((s,m)=>s+m.reading,0);
+  const qTotD=qStats.reduce((s,m)=>s+m.exercise,0);
+  const qTotDays=qStats.reduce((s,m)=>s+m.totalDays,0);
+
+  // Build daily bars for selected month
+  const dim=daysInMonth(selMonth);
+  let dailyBars='';let dailyLabels='';
+  for(let d=1;d<=dim;d++){
+    const ds=`${selMonth}-${String(d).padStart(2,'0')}`;
+    const lg=allLogs.find(l=>l.date===ds);
+    const cnt=lg?[lg.gratitude,lg.reading,lg.exercise||lg.deadBugs].filter(Boolean).length:0;
+    const h=cnt===0?2:cnt/3*100;
+    const color=cnt===3?'var(--chart-1)':cnt===2?'var(--chart-3)':cnt===1?'var(--chart-4)':'var(--surface-2)';
+    dailyBars+=`<div class="chart-bar" style="height:${h}%;background:${color}" data-tooltip="Day ${d}: ${cnt}/3"></div>`;
+    if(d%5===1||d===dim)dailyLabels+=`<span>${d}</span>`;else dailyLabels+=`<span></span>`;
+  }
+
+  // Quarter chart
+  const maxQ=Math.max(...qStats.flatMap(s=>[s.gratitude,s.reading,s.exercise]),1);
+
+  app.innerHTML=`<div class="page"><div class="container space-y">
+    <div class="flex items-center gap-3">
+      <button class="btn-icon btn-ghost" onclick="goDashboard()">${icons.back}</button>
+      <div><h1 class="text-xl font-bold">Progress & Insights</h1><p class="text-sm text-muted">Track your habit consistency over time</p></div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab ${state.progressTab==='monthly'?'active':''}" onclick="setProgressTab('monthly')">Monthly</div>
+      <div class="tab ${state.progressTab==='quarterly'?'active':''}" onclick="setProgressTab('quarterly')">Quarterly</div>
+    </div>
+
+    ${state.progressTab==='monthly'?`
+      <div class="flex gap-2">${qMonths.map(m=>`<button class="btn btn-sm ${selMonth===m?'btn-primary':'btn-secondary'}" onclick="selectMonth('${m}')">${monthShort(m)}</button>`).join('')}</div>
+      <div class="grid-4">
+        ${statCard('Gratitude',ms.gratitude,ms.totalDays)}
+        ${statCard('Reading',ms.reading,ms.totalDays)}
+        ${statCard('Exercise',ms.exercise,ms.totalDays)}
+        ${statCard('All 3 Done',ms.allThree,ms.totalDays)}
+      </div>
+      <div class="card"><div class="card-header"><h2 class="text-base font-semibold flex items-center gap-2"><span class="text-primary">${icons.chart}</span> Daily Breakdown — ${ms.monthFull}</h2></div>
+        <div class="card-body"><p class="text-xs text-muted mb-2">Habits completed per day (out of 3)</p>
+        <div class="chart-container"><div class="chart-bars">${dailyBars}</div><div class="chart-labels">${dailyLabels}</div></div></div></div>
+    `:`
+      <div class="flex items-center gap-2"><span class="badge badge-muted">${currentQuarter()}</span><span class="text-sm text-muted">${monthName(qMonths[0])} — ${monthName(qMonths[2])}</span></div>
+      <div class="grid-2" style="grid-template-columns:repeat(3,1fr)">
+        ${statCard('Gratitude',qTotG,qTotDays)}
+        ${statCard('Reading',qTotR,qTotDays)}
+        ${statCard('Exercise',qTotD,qTotDays)}
+      </div>
+      <div class="card"><div class="card-header"><h2 class="text-base font-semibold flex items-center gap-2"><span class="text-primary">${icons.chart}</span> Quarterly Summary — ${currentQuarter()}</h2></div>
+        <div class="card-body"><p class="text-xs text-muted mb-3">Days each habit was completed per month</p>
+        <div class="flex justify-between" style="gap:2rem;padding:0 1rem">
+          ${qStats.map(s=>`<div class="quarter-group">
+            <div class="quarter-group-bars">
+              <div class="q-bar" style="height:${s.gratitude/maxQ*100}%;background:var(--chart-1)"></div>
+              <div class="q-bar" style="height:${s.reading/maxQ*100}%;background:var(--chart-2)"></div>
+              <div class="q-bar" style="height:${s.exercise/maxQ*100}%;background:var(--chart-3)"></div>
+            </div>
+            <span class="text-xs text-muted">${s.month}</span>
+          </div>`).join('')}
+        </div>
+        <div class="legend mt-3" style="justify-content:center">
+          <span><span class="legend-dot" style="background:var(--chart-1)"></span>Gratitude</span>
+          <span><span class="legend-dot" style="background:var(--chart-2)"></span>Reading</span>
+          <span><span class="legend-dot" style="background:var(--chart-3)"></span>Exercise</span>
+        </div></div></div>
+
+      <div class="grid-2" style="grid-template-columns:repeat(3,1fr)">
+        ${qStats.map(s=>`<div class="card"><div class="card-body p-3">
+          <p class="text-sm font-semibold mb-2">${s.monthFull}</p>
+          ${progressRow('Gratitude',s.gratitudeRate,'var(--chart-1)')}
+          ${progressRow('Reading',s.readingRate,'var(--chart-2)')}
+          ${progressRow('Exercise',s.exerciseRate,'var(--chart-3)')}
+        </div></div>`).join('')}
+      </div>
+    `}
+  </div>
+  <footer><a href="https://www.perplexity.ai/computer" target="_blank" rel="noopener noreferrer">Created with Perplexity Computer</a></footer>
+  </div>`;
+}
+
+// ===== SUMMARY PAGE =====
+function getMonthKey(offset){
+  const d=new Date();
+  d.setDate(1);
+  d.setMonth(d.getMonth()+offset);
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+}
+function getQuarterKey(ym){
+  const[y,m]=ym.split('-');
+  return `${y}-Q${Math.ceil(+m/3)}`;
+}
+
+function renderSummary(){
+  const allLogs=state.allLogs;
+  const allGoals=state.allGoals;
+  const offset=state.summaryMonthOffset;
+  const viewMonth=getMonthKey(offset);
+  const viewQ=getQuarterKey(viewMonth);
+  const isCurrentMonth=(viewMonth===currentMonth());
+
+  // Habit stats for this month
+  const ml=allLogs.filter(l=>l.date.startsWith(viewMonth));
+  const td=daysInMonth(viewMonth);
+  const today=new Date();
+  const daysElapsed=isCurrentMonth?today.getDate():td;
+  const gr=ml.filter(l=>l.gratitude).length;
+  const rd=ml.filter(l=>l.reading).length;
+  const ex=ml.filter(l=>l.exercise||l.deadBugs).length;
+  const allDone=ml.filter(l=>l.gratitude&&l.reading&&(l.exercise||l.deadBugs)).length;
+
+  function habitRow(label,count,icon,color){
+    const pct=daysElapsed?Math.round(count/daysElapsed*100):0;
+    return `<div class="card"><div class="card-body p-3">
+      <div class="flex items-center gap-2 mb-2">
+        <span>${icon}</span>
+        <p class="text-sm font-semibold">${label}</p>
+        <span class="badge badge-muted" style="margin-left:auto">${pct}%</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="flex-1"><div class="progress-track"><div class="progress-fill" style="width:${pct}%;background:${color}"></div></div></div>
+        <span class="text-xs tabular-nums text-muted">${count}/${daysElapsed} days</span>
+      </div>
+    </div></div>`;
+  }
+
+  // Goals for this month
+  const mGoals=allGoals.filter(g=>g.type==='monthly'&&g.period===viewMonth);
+  const mCompleted=mGoals.filter(g=>g.completed).length;
+
+  // Quarterly goals for the quarter this month belongs to
+  const qGoals=allGoals.filter(g=>g.type==='quarterly'&&g.period===viewQ);
+  const qCompleted=qGoals.filter(g=>g.completed).length;
+
+  const cats=[
+    {key:'business',label:'Business',icon:icons.briefcase,cls:'cat-business'},
+    {key:'health',label:'Health / Personal',icon:icons.heart,cls:'cat-health'},
+    {key:'family',label:'Family / Relationships',icon:icons.users,cls:'cat-family'},
+  ];
+
+  function goalSection(goals,completed,total,title,periodLabel){
+    if(goals.length===0) return `<div class="card"><div class="card-body p-4 text-center"><p class="text-sm text-muted">No ${title.toLowerCase()} for ${periodLabel}</p></div></div>`;
+    return `<div class="card">
+      <div class="card-header">
+        <span class="flex items-center gap-2"><span class="text-primary">${icons.target}</span><h3 class="text-base font-semibold">${title}</h3></span>
+        <span class="badge ${completed===total&&total>0?'badge-success':'badge-muted'}">${completed}/${total} done</span>
+      </div>
+      <div class="card-body">
+        ${cats.map(cat=>{
+          const cg=goals.filter(g=>g.category===cat.key);
+          if(cg.length===0)return '';
+          return `<div class="mb-3">
+            <div class="flex items-center gap-2 mb-2"><span class="${cat.cls}">${cat.icon}</span>
+            <p class="text-xs font-medium uppercase tracking-wide text-muted">${cat.label}</p></div>
+            ${cg.map(g=>`<div class="flex items-center gap-2 mb-1" style="padding:0.15rem 0">
+              <div class="cbox cbox-sm ${g.completed?'checked':''}" style="pointer-events:none">${icons.check}</div>
+              <span class="text-sm flex-1 ${g.completed?'line-through text-muted':''}">${esc(g.text)}</span>
+            </div>`).join('')}
+          </div>`;
+        }).join('')}
+      </div></div>`;
+  }
+
+  app.innerHTML=`<div class="page"><div class="container space-y">
+    <div class="flex items-center gap-3">
+      <button class="btn-icon btn-ghost" onclick="goDashboard()">${icons.back}</button>
+      <div><h1 class="text-xl font-bold">Summary</h1><p class="text-sm text-muted">Habit stats &amp; goals history</p></div>
+    </div>
+
+    <!-- Month Navigator -->
+    <div class="flex items-center justify-between">
+      <button class="btn btn-ghost btn-sm" onclick="summaryNav(-1)">${icons.back} Prev</button>
+      <span class="text-base font-semibold">${monthName(viewMonth)}</span>
+      <button class="btn btn-ghost btn-sm ${isCurrentMonth?'text-faint':''}" onclick="summaryNav(1)" ${isCurrentMonth?'disabled':''}>Next ${icons.right}</button>
+    </div>
+
+    <!-- Habit Stats -->
+    <div>
+      <h2 class="text-base font-semibold flex items-center gap-2 mb-3"><span class="text-primary">${icons.checkCircle}</span> Habit Completion — ${monthName(viewMonth)}</h2>
+      <div class="grid-2">
+        ${habitRow('Gratitude',gr,icons.sunHabit,'var(--chart-1)')}
+        ${habitRow('Reading',rd,icons.book,'var(--chart-2)')}
+        ${habitRow('Exercise',ex,icons.exercise,'var(--chart-3)')}
+        ${habitRow('All 3 Done',allDone,icons.checkCircle,'var(--primary)')}
+      </div>
+      <p class="text-xs text-muted mt-2">${isCurrentMonth?`${daysElapsed} days elapsed out of ${td} this month`:`${td} days in month`}</p>
+    </div>
+
+    <!-- Monthly Goals -->
+    <div>
+      <h2 class="text-base font-semibold flex items-center gap-2 mb-3"><span class="text-primary">${icons.calendar}</span> Monthly Goals</h2>
+      ${goalSection(mGoals,mCompleted,mGoals.length,'Monthly Goals',monthName(viewMonth))}
+    </div>
+
+    <!-- Quarterly Goals -->
+    <div>
+      <h2 class="text-base font-semibold flex items-center gap-2 mb-3"><span class="text-primary">${icons.target}</span> Quarterly Goals — ${quarterLabel(viewQ)}</h2>
+      ${goalSection(qGoals,qCompleted,qGoals.length,'Quarterly Goals',quarterLabel(viewQ))}
+    </div>
+
+  </div>
+  <footer><a href="https://www.perplexity.ai/computer" target="_blank" rel="noopener noreferrer">Created with Perplexity Computer</a></footer>
+  </div>`;
+}
+
+function summaryNav(dir){
+  const next=state.summaryMonthOffset+dir;
+  if(next>0)return;
+  state.summaryMonthOffset=next;
+  render();
+  window.scrollTo(0,0);
+}
+
+function statCard(label,value,total){
+  const pct=total?Math.round(value/total*100):0;
+  return `<div class="stat"><div class="stat-icon"><span class="text-primary">${icons.calendar}</span></div>
+    <div><p class="text-xs text-muted">${label}</p><p class="text-sm font-semibold tabular-nums">${value}/${total} days <span class="text-muted font-medium" style="font-weight:400">(${pct}%)</span></p></div></div>`;
+}
+
+function progressRow(label,pct,color){
+  return `<div class="mb-2"><div class="flex justify-between text-xs mb-1"><span class="text-muted">${label}</span><span class="tabular-nums font-medium">${pct}%</span></div>
+  <div class="progress-track"><div class="progress-fill" style="width:${pct}%;background:${color}"></div></div></div>`;
+}
+
+// ===== ACTIONS =====
+function toggleTheme(){state.dark=!state.dark;document.documentElement.classList.toggle('dark',state.dark);render()}
+function startEditVM(){state.editingVM=true;render()}
+function cancelEditVM(){state.editingVM=false;render()}
+async function saveVM(){
+  state.vm.vision=document.getElementById('vm-vision').value;
+  state.vm.mission=document.getElementById('vm-mission').value;
+  await dbPut('settings',state.vm);
+  state.editingVM=false;render();
+}
+
+async function toggleHabit(key){
+  state.todayLog[key]=!state.todayLog[key];
+  await dbPut('dailyLogs',state.todayLog);
+  state.allLogs=await dbGetAll('dailyLogs');
+  render();
+}
+
+async function submitHabit(key,textKey){
+  const input=document.getElementById('habit-input-'+key);
+  const text=input?input.value.trim():'';
+  if(!text)return;
+  state.todayLog[textKey]=text;
+  state.todayLog[key]=true;
+  await dbPut('dailyLogs',state.todayLog);
+  state.allLogs=await dbGetAll('dailyLogs');
+  render();
+}
+
+async function toggleGoal(id,type){
+  const goals=type==='monthly'?state.monthlyGoals:state.quarterlyGoals;
+  const g=goals.find(x=>x.id===id);
+  if(g){
+    g.completed=!g.completed;
+    await dbPut('goals',g);
+    // Sync to allGoals
+    const ag=state.allGoals.find(x=>x.id===id);
+    if(ag)ag.completed=g.completed;
+    render();
+  }
+}
+
+async function deleteGoal(id,type){
+  await dbDelete('goals',id);
+  if(type==='monthly')state.monthlyGoals=state.monthlyGoals.filter(g=>g.id!==id);
+  else state.quarterlyGoals=state.quarterlyGoals.filter(g=>g.id!==id);
+  state.allGoals=state.allGoals.filter(g=>g.id!==id);
+  render();
+}
+
+function startAddGoal(type){state.addingGoal={type,category:'business'};state.newGoalText='';render();setTimeout(()=>{const i=document.getElementById('new-goal-input');if(i)i.focus()},50)}
+function setGoalCat(cat){state.addingGoal.category=cat;render();setTimeout(()=>{const i=document.getElementById('new-goal-input');if(i){i.focus();i.value=state.newGoalText}},50)}
+function cancelAddGoal(){state.addingGoal=null;state.newGoalText='';render()}
+
+async function saveGoal(type,period){
+  const text=state.newGoalText.trim();if(!text)return;
+  const g={id:uuid(),type,category:state.addingGoal.category,period,text,completed:false};
+  await dbPut('goals',g);
+  if(type==='monthly')state.monthlyGoals.push(g);else state.quarterlyGoals.push(g);
+  state.allGoals.push(g);
+  state.addingGoal=null;state.newGoalText='';render();
+}
+
+function goProgress(){state.page='progress';state.progressTab='monthly';state.selectedMonth=currentMonth();render();window.scrollTo(0,0)}
+function goSummary(){state.page='summary';state.summaryMonthOffset=0;render();window.scrollTo(0,0)}
+function goDashboard(){state.page='dashboard';render();window.scrollTo(0,0)}
+function setProgressTab(t){state.progressTab=t;render()}
+function selectMonth(m){state.selectedMonth=m;render()}
+
+function esc(s){if(!s)return'';return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+// ===== INIT =====
+init();
+</script>
+</body>
+</html>
